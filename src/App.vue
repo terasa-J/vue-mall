@@ -17,5 +17,6 @@ export default {
 </script>
 
 <style>
+/* 引入全局默认样式 */
 @import "assets/css/base.css";
 </style>

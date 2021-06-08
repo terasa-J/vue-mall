@@ -1,16 +1,36 @@
 <template>
-  <div>
-    <h2>首页</h2>
-    11
+  <div id="home">
+    <nav-bar class="home-nav">
+      <div slot="center">购物车</div>
+    </nav-bar>
   </div>
 </template>
 
 <script>
-  export default {
-    name: "Home"
+import NavBar from "components/common/navbar/NavBar.vue";
+import {getHomeMulitdata} from 'network/home'
+
+export default {
+  name: "Home",
+  components: {
+    NavBar,
+  },
+  data(){
+    return{
+
+    }
+  },
+  created(){
+    getHomeMulitdata().then(res=>{
+      console.log(res,"homeRes")
+    })
   }
+};
 </script>
 
 <style scoped>
-
+.home-nav{
+  background-color: var(--color-tint);
+  color: #fff;
+}
 </style>
