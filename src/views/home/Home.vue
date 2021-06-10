@@ -122,8 +122,6 @@ export default {
     getHomeGoods(type) {
       const res = goodDataMock()
       this.goods[type].list.push(...res.data)
-      console.log(JSON.stringify(this.goods) + "JSON.stringify");
-
     },
     
   },
