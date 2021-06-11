@@ -3,6 +3,7 @@
     <nav-bar class="home-nav">
       <div slot="center">购物车</div>
     </nav-bar>
+    <!-- 滚动条存在问题：图片加载后高度发生变化，但是滚动条未更新 -->
     <my-scroll class="content" ref="scroll">
       <home-swiper :banners="banners" />
       <recommond-view :recommends="recommends" />
