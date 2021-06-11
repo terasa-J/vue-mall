@@ -1,6 +1,11 @@
 <template>
   <div class="good-list">
-    <good-list-item v-for="(item, index) in goods" :key="index" :goodItem="item" class="good-list-item"/>
+    <good-list-item
+      v-for="(item, index) in goods"
+      :key="index"
+      :goodItem="item"
+      class="good-list-item"
+    />
   </div>
 </template>
 
@@ -20,15 +25,16 @@ export default {
   components: {
     GoodListItem,
   },
+  methods:{
+  }
 };
 </script>
 <style scoped>
-.good-list{
-  display: flex;  
+.good-list {
+  display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
 
   padding: 2px;
 }
-
 </style>

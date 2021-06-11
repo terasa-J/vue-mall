@@ -3,15 +3,17 @@
     <nav-bar class="home-nav">
       <div slot="center">购物车</div>
     </nav-bar>
-    <home-swiper :banners="banners"></home-swiper>
-    <recommond-view :recommends="recommends"> </recommond-view>
-    <feature-view></feature-view>
-    <tab-control
-      class="tab-control"
-      :titles="['流行', '新款', '精选']"
-    ></tab-control>
-    <good-list :goods="goods['pop'].list"></good-list>
-    <div style="height: 800px">111</div>
+    <my-scroll class="content" ref="scroll">
+      <home-swiper :banners="banners" />
+      <recommond-view :recommends="recommends" />
+      <feature-view />
+      <tab-control
+        class="tab-control"
+        :titles="['流行', '新款', '精选']"
+        @tabClick="tabClick"
+      />
+      <good-list :goods="currentGoodType"/>
+    </my-scroll>
   </div>
 </template>
 
@@ -22,10 +24,16 @@ import FeatureView from "./childComps/FeatureView";
 
 import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
-import GoodList from "components/content/goods/GoodList"
+import GoodList from "components/content/goods/GoodList";
+import MyScroll from "components/common/scroll/Scroll";
 
 import { getHomeMulitdata, getHomeGoods } from "network/home";
-import { goodDataMock } from "common/mockData/goods"
+import {
+  mockPopGoods,
+  mockNewGoods,
+  mockSellGoods,
+} from "common/mockData/goods";
+
 export default {
   name: "Home",
   components: {
@@ -36,6 +44,7 @@ export default {
     NavBar,
     TabControl,
     GoodList,
+    MyScroll,
   },
   data() {
     return {
@@ -79,20 +88,27 @@ export default {
           title: "推荐4号",
         },
       ],
-      goods:{
-        "pop":{page:0, list:[]},
-        "new":{page:0, list:[]},
-        "sell":{page:0, list:[]},
-      }
+      goods: {
+        pop: { page: 0, list: [] },
+        new: { page: 0, list: [] },
+        sell: { page: 0, list: [] },
+      },
+      currentType: "pop",
     };
+  },
+  computed: {
+    currentGoodType() {
+      return this.goods[this.currentType].list;
+    },
   },
   created() {
     //网络不通，写mock数据
-    this.getHomeMulitdata();
-    this.getHomeGoods('pop');
+    // this.getHomeMulitdata();
+    this.getHomeMockGoods();
   },
   methods: {
     /**
+     *  无效网络请求
      *  初始化 banners、recommends
      */
     getHomeMulitdata() {
@@ -104,7 +120,7 @@ export default {
           console.log(err + "请求getHomeGoods");
         });
 
-        getHomeGoods()
+      getHomeGoods();
     },
 
     /**
@@ -119,18 +135,32 @@ export default {
     //       console.log(err + "请求getHomeGoods");
     //     });
     // },
-    getHomeGoods(type) {
-      const res = goodDataMock()
-      this.goods[type].list.push(...res.data)
+    tabClick(index) {
+      switch (index) {
+        case 0:
+          this.currentType = "pop";
+          break;
+        case 1:
+          this.currentType = "new";
+          break;
+        case 2:
+          this.currentType = "sell";
+          break;
+      }
     },
-    
+    getHomeMockGoods() {
+      this.goods["pop"].list.push(...mockPopGoods().data);
+      this.goods["new"].list.push(...mockNewGoods().data);
+      this.goods["sell"].list.push(...mockSellGoods().data);
+    },
   },
 };
 </script>
 
 <style scoped>
 #home {
-  padding-top: 44px;
+  height: 100vh;
+  position: relative;
 }
 .home-nav {
   background-color: var(--color-tint);
@@ -144,5 +174,21 @@ export default {
 .tab-control {
   position: sticky;
   top: 44px;
+  z-index: 9;
 }
+
+.content {
+  overflow: hidden;
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0;
+}
+
+/* .content {
+  overflow: hidden;
+  height: calc(100% - 93px);
+  margin-top: 44px;
+} */
 </style>
