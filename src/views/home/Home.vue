@@ -3,8 +3,15 @@
     <nav-bar class="home-nav">
       <div slot="center">购物车</div>
     </nav-bar>
-    <!-- 滚动条存在问题：图片加载后高度发生变化，但是滚动条未更新 -->
-    <my-scroll class="content" ref="scroll">
+    <!-- 滚动条存在问题：图片加载后高度发生变化，但是滚动条未更新。请求时间差问题 -->
+    <my-scroll
+      class="content"
+      ref="scroll"
+      :probe-type="3"
+      @scroll="contentScroll"
+      :pull-up-load="true"
+      @pullingUp="loadMore"
+    >
       <home-swiper :banners="banners" />
       <recommond-view :recommends="recommends" />
       <feature-view />
@@ -13,8 +20,10 @@
         :titles="['流行', '新款', '精选']"
         @tabClick="tabClick"
       />
-      <good-list :goods="currentGoodType"/>
+      <good-list :goods="currentGoodType" />
     </my-scroll>
+
+    <back-top @click.native="backClick" v-show="isShowBackTop" />
   </div>
 </template>
 
@@ -27,6 +36,7 @@ import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
 import GoodList from "components/content/goods/GoodList";
 import MyScroll from "components/common/scroll/Scroll";
+import BackTop from "components/content/backTop/BackTop";
 
 import { getHomeMulitdata, getHomeGoods } from "network/home";
 import {
@@ -46,6 +56,7 @@ export default {
     TabControl,
     GoodList,
     MyScroll,
+    BackTop,
   },
   data() {
     return {
@@ -95,6 +106,7 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
+      isShowBackTop: false,
     };
   },
   computed: {
@@ -105,13 +117,15 @@ export default {
   created() {
     //网络不通，写mock数据
     // this.getHomeMulitdata();
-    this.getHomeMockGoods();
+    this.getHomeMockGoods("pop");
+    this.getHomeMockGoods("new");
+    this.getHomeMockGoods("sell");
   },
   methods: {
     /**
-     *  无效网络请求
-     *  初始化 banners、recommends
+     *  网络请求相关--无效
      */
+    //初始化 banners、recommends
     getHomeMulitdata() {
       getHomeMulitdata()
         .then((res) => {
@@ -123,10 +137,7 @@ export default {
 
       getHomeGoods();
     },
-
-    /**
-     *  初始化 流行、新款、精选
-     */
+    //初始化 流行、新款、精选
     // getHomeGoods(type) {
     //   getHomeGoods(type)
     //     .then((res) => {
@@ -136,6 +147,27 @@ export default {
     //       console.log(err + "请求getHomeGoods");
     //     });
     // },
+    //获取mock数据
+     getHomeMockGoods(type) {
+      return new Promise((resolve, reject) => {
+        switch (type) {
+          case "pop":
+            this.goods["pop"].list.push(...mockPopGoods().data);
+            break;
+          case "new":
+            this.goods["new"].list.push(...mockNewGoods().data);
+            break;
+          case "sell":
+            this.goods["sell"].list.push(...mockSellGoods().data);
+            break;
+        }
+        resolve();
+      });
+    },
+    /**
+     * 事件监听类相关
+     */
+    //tab类型切换
     tabClick(index) {
       switch (index) {
         case 0:
@@ -149,10 +181,20 @@ export default {
           break;
       }
     },
-    getHomeMockGoods() {
-      this.goods["pop"].list.push(...mockPopGoods().data);
-      this.goods["new"].list.push(...mockNewGoods().data);
-      this.goods["sell"].list.push(...mockSellGoods().data);
+    //返回顶部
+    backClick() {
+      this.$refs.scroll.scrollTo(0, 0);
+    },
+    //获取实时位置监听
+    contentScroll(position) {
+      //当前位置>500,才显示按钮
+      this.isShowBackTop = -position.y > 500;
+    },
+    //加载到底部，刷新更多
+    async loadMore() {
+      await this.getHomeMockGoods(this.currentType).then(()=>{
+        this.$refs.scroll.finishPullUp();
+      });
     },
   },
 };
