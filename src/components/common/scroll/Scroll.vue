@@ -42,21 +42,27 @@ export default {
     this.scroll.on("scroll", (position) => {
       this.$emit("scroll", position);
     });
-
+    
     //3.监听底部下拉加载
     this.scroll.on("pullingUp", () => {
       this.$emit("pullingUp");
     });
+
+    // scroll中的scrollerHeight属性，控制需要滚动内容的高度
+    // console.log(this.scroll)
   },
   methods: {
     scrollTo(x, y, time = 500) {
-      // console.log(this.scroll)
-      this.scroll.scrollTo(x, y, time);
+      this.scroll && this.scroll.scrollTo(x, y, time);
     },
     //加载完毕一次后需要，调用次方法。否则无法进行再次加载
-    finishPullUp(){
-      this.scroll.finishPullUp();
-    }
+    finishPullUp() {
+      this.scroll && this.scroll.finishPullUp();
+    },
+    refresh(){
+      //严谨：先判断是否初始化好了this.scroll
+      this.scroll && this.scroll.refresh();
+    },
   },
 };
 </script>

@@ -121,6 +121,13 @@ export default {
     this.getHomeMockGoods("new");
     this.getHomeMockGoods("sell");
   },
+  mounted() {
+    //监听图片加载事件
+    //由于放在create可能会存在拿不到dom元素，因此放在mounted中
+    this.$bus.$on("goodImgLoad", () => {
+      this.$refs.scroll.refresh();
+    });
+  },
   methods: {
     /**
      *  网络请求相关--无效
@@ -148,7 +155,7 @@ export default {
     //     });
     // },
     //获取mock数据
-     getHomeMockGoods(type) {
+    getHomeMockGoods(type) {
       return new Promise((resolve, reject) => {
         switch (type) {
           case "pop":
@@ -192,7 +199,7 @@ export default {
     },
     //加载到底部，刷新更多
     async loadMore() {
-      await this.getHomeMockGoods(this.currentType).then(()=>{
+      await this.getHomeMockGoods(this.currentType).then(() => {
         this.$refs.scroll.finishPullUp();
       });
     },
