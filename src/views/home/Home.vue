@@ -124,8 +124,13 @@ export default {
   mounted() {
     //监听图片加载事件
     //由于放在create可能会存在拿不到dom元素，因此放在mounted中
+
+    //为了减少函数的调用次数，这里使用防抖函数
+    const refrsh = this.debounce(this.$refs.scroll.refresh, 100)
     this.$bus.$on("goodImgLoad", () => {
-      this.$refs.scroll.refresh();
+      // this.$refs.scroll.refresh();
+      // ...args的作用  refrsh("111","2222")
+      refrsh()
     });
   },
   methods: {
@@ -174,6 +179,16 @@ export default {
     /**
      * 事件监听类相关
      */
+    //防抖函数
+    debounce(func, delay){
+      let timer = null;
+      return function(...args){
+        if(timer) clearTimeout(timer);
+        timer = setTimeout(()=>{
+          func.apply(this, args);
+        }, delay)
+      }
+    },
     //tab类型切换
     tabClick(index) {
       switch (index) {
