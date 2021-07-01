@@ -3,7 +3,15 @@
     <nav-bar class="home-nav">
       <div slot="center">购物车</div>
     </nav-bar>
-    <!-- 滚动条存在问题：图片加载后高度发生变化，但是滚动条未更新。请求时间差问题 -->
+    <!-- 吸顶效果 -->
+    <tab-control
+        class="tab-control-top"
+        :titles="['流行', '新款', '精选']"
+        @tabClick="tabClick"
+        ref="tabControlTop"
+        v-show="isOffsetTop"
+      />
+      
     <my-scroll
       class="content"
       ref="scroll"
@@ -12,13 +20,14 @@
       :pull-up-load="true"
       @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" />
+      <home-swiper :banners="banners" @swiperImgLoad="swiperImgLoad"/>
       <recommond-view :recommends="recommends" />
       <feature-view />
       <tab-control
         class="tab-control"
         :titles="['流行', '新款', '精选']"
         @tabClick="tabClick"
+        ref="tabControl"
       />
       <good-list :goods="currentGoodType" />
     </my-scroll>
@@ -44,6 +53,8 @@ import {
   mockNewGoods,
   mockSellGoods,
 } from "common/mockData/goods";
+
+import { debounce } from 'common/utils'
 
 export default {
   name: "Home",
@@ -107,6 +118,10 @@ export default {
       },
       currentType: "pop",
       isShowBackTop: false,
+      //获取吸顶距离
+      tabControlOffSet: 0 ,
+      //判断是否需要吸顶
+      isOffsetTop:false,
     };
   },
   computed: {
@@ -126,7 +141,7 @@ export default {
     //由于放在create可能会存在拿不到dom元素，因此放在mounted中
 
     //为了减少函数的调用次数，这里使用防抖函数
-    const refrsh = this.debounce(this.$refs.scroll.refresh, 100)
+    const refrsh = debounce(this.$refs.scroll.refresh, 100)
     this.$bus.$on("goodImgLoad", () => {
       // this.$refs.scroll.refresh();
       // ...args的作用  refrsh("111","2222")
@@ -179,16 +194,6 @@ export default {
     /**
      * 事件监听类相关
      */
-    //防抖函数
-    debounce(func, delay){
-      let timer = null;
-      return function(...args){
-        if(timer) clearTimeout(timer);
-        timer = setTimeout(()=>{
-          func.apply(this, args);
-        }, delay)
-      }
-    },
     //tab类型切换
     tabClick(index) {
       switch (index) {
@@ -202,6 +207,9 @@ export default {
           this.currentType = "sell";
           break;
       }
+      // 由于吸顶有多个组件，这这里需要设置点击那个
+      this.$refs.tabControl.currentIndex = index
+      this.$refs.tabControlTop.currentIndex = index
     },
     //返回顶部
     backClick() {
@@ -209,8 +217,11 @@ export default {
     },
     //获取实时位置监听
     contentScroll(position) {
-      //当前位置>500,才显示按钮
+      //1.设置当前位置>500,显示backTop按钮
       this.isShowBackTop = -position.y > 500;
+
+      //2.获取tabControl吸顶位置
+      this.isOffsetTop = -position.y > this.tabControlOffSet
     },
     //加载到底部，刷新更多
     async loadMore() {
@@ -218,6 +229,13 @@ export default {
         this.$refs.scroll.finishPullUp();
       });
     },
+    //吸顶距离判断
+    swiperImgLoad(){
+      //this.$refs.tabControl:获取到的是一个组件
+      //this.$refs.tabControl.$el:获取到的是一个元素，可以获取相关的属性
+      //offsetTop 指 obj 距离上方或上层控件的位置，整型，单位像素。
+      this.tabControlOffSet = this.$refs.tabControl.$el.offsetTop
+    }
   },
 };
 </script>
@@ -230,15 +248,23 @@ export default {
 .home-nav {
   background-color: var(--color-tint);
   color: #fff;
-  position: fixed;
+/* 在better-scroll中无效，如果使用原生滚动，则有效 */
+  /* position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 9;
+  z-index: 9; */
 }
-.tab-control {
+
+/* 在better-scroll中无效，如果使用原生滚动，则有效 */
+/* .tab-control {
   position: sticky;
   top: 44px;
+  z-index: 9;
+} */
+
+.tab-control-top{
+  position: relative;
   z-index: 9;
 }
 
