@@ -63,6 +63,9 @@ export default {
       //严谨：先判断是否初始化好了this.scroll
       this.scroll && this.scroll.refresh();
     },
+    getScrollY(){
+      return this.scroll ? this.scroll.y : 0;
+    },
   },
 };
 </script>

@@ -11,7 +11,7 @@
         ref="tabControlTop"
         v-show="isOffsetTop"
       />
-      
+
     <my-scroll
       class="content"
       ref="scroll"
@@ -122,12 +122,26 @@ export default {
       tabControlOffSet: 0 ,
       //判断是否需要吸顶
       isOffsetTop:false,
+      //记录滚动Y轴的位置
+      scrollY:0,
     };
   },
   computed: {
     currentGoodType() {
       return this.goods[this.currentType].list;
     },
+  },
+  destroyed(){
+    // console.log("hoem destroyed")
+  },
+  activated(){
+    // console.log("hoem activated")
+    this.$refs.scroll.scrollTo(0, this.scrollY, 0)
+    this.$refs.scroll.refresh()
+  },
+  deactivated(){
+    this.scrollY = this.$refs.scroll.getScrollY()
+    // console.log("hoem deactivated",this.scrollY)
   },
   created() {
     //网络不通，写mock数据
@@ -235,6 +249,7 @@ export default {
       //this.$refs.tabControl.$el:获取到的是一个元素，可以获取相关的属性
       //offsetTop 指 obj 距离上方或上层控件的位置，整型，单位像素。
       this.tabControlOffSet = this.$refs.tabControl.$el.offsetTop
+      // console.log(this.tabControlOffSet)
     }
   },
 };
