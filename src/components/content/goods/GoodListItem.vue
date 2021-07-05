@@ -27,7 +27,9 @@ export default {
     itemClick() {
       this.$router.push({
         path: "/detail",
-        query: { iid: this.goodItem.iid },
+        query: {
+          iid: this.goodItem.iid,
+        },
       });
     },
   },
