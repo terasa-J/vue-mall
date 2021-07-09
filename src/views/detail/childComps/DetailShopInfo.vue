@@ -135,12 +135,11 @@ export default {
   justify-content: center;
 }
 .enter-shop{
-  /* line-height: 20px; */
-  font-size: 15px;
+  line-height: 10px;
+  font-size: 10px;
   padding: 5px 40px;
-  color: #999;
-  background-color: #f8f8f8;
-  border:5px solid #f8f8f8;
-  border-radius: 40%;
+  background-color: #f1f0f0;
+  border:5px solid #f1f0f0;
+  border-radius: 15%;
 }
 </style>

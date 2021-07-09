@@ -42,11 +42,13 @@ export default {
     this.scroll.on("scroll", (position) => {
       this.$emit("scroll", position);
     });
-    
+
     //3.监听底部下拉加载
-    this.scroll.on("pullingUp", () => {
-      this.$emit("pullingUp");
-    });
+    if (this.pullUpLoad) {
+      this.scroll.on("pullingUp", () => {
+        this.$emit("pullingUp");
+      })
+    }
 
     // scroll中的scrollerHeight属性，控制需要滚动内容的高度
     // console.log(this.scroll)
@@ -59,11 +61,11 @@ export default {
     finishPullUp() {
       this.scroll && this.scroll.finishPullUp();
     },
-    refresh(){
+    refresh() {
       //严谨：先判断是否初始化好了this.scroll
       this.scroll && this.scroll.refresh();
     },
-    getScrollY(){
+    getScrollY() {
       return this.scroll ? this.scroll.y : 0;
     },
   },
