@@ -60,7 +60,7 @@ export default {
 }
 .info-param-key {
   /* 当value数据量较大，会挤到key的位置，因设置一个固定高度 */
-  width: 120px;
+  width: 90px;
 }
 
 .param-value {
