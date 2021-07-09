@@ -1,18 +1,20 @@
 <template>
   <div v-if="Object.keys(detailInfo).length !== 0" class="goods-info">
-    <div class="info-desc">
+    <div class="info-desc clear-fix">
       <div class="start"></div>
       <div class="desc">{{ detailInfo.desc }}</div>
       <div class="end"></div>
     </div>
-    <div class="info-key">{{ detailInfo.detailImage[0].key }}</div>
-    <div class="info-list">
-      <img
-        v-for="(item, index) in detailInfo.detailImage[0].list"
-        :src="item"
-        :key="index"
-        @load="imgLoad"
-      />
+    <div v-for="(item, index) in detailInfo.detailImage" :key="index">
+      <div class="info-key">{{ item.key }}</div>
+      <div class="info-list">
+        <img
+          v-for="(img, indey) in item.list"
+          :src="img"
+          :key="indey"
+          @load="imgLoad"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -61,29 +63,45 @@ export default {
   border-bottom: 5px solid #f2f5f8;
 }
 .info-desc {
-  margin: 0 20px;
+  padding: 0 15px;
+}
+.info-desc .start,
+.info-desc .end {
+  width: 90px;
+  height: 1px;
+  background-color: #a3a3a5;
+  position: relative;
 }
 .info-desc .start {
-  width: 50px;
-  /* border-radius: 50%; */
-  border: 1px solid rgba(0, 0, 0, 1);
-  /* border-left: 5px solid rgba(0, 0, 0, 1); */
-  /* border-bottom: 1px solid rgba(0, 0, 0, 1); */
-}
-
-.info-desc .desc {
-  margin: 20px;
+  float: left;
 }
 
 .info-desc .end {
-  width: 50px;
-  border: 1px solid rgba(0, 0, 0, 1);
   float: right;
+}
+/* 使用伪元素,画出圆点 */
+.info-desc .start::before,
+.info-desc .end::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background-color: #333;
+  bottom: 0;
+}
+.info-desc .end::after {
+  right: 0;
+}
+
+.info-desc .desc {
+  padding: 15px 0;
+  font-size: 14px;
 }
 
 .info-key {
-  margin: 20px;
-  color: black;
+  margin: 10px 0 10px 15px;
+  color: #333;
+  font-size: 15px;
 }
 .info-list img {
   width: 100%;
