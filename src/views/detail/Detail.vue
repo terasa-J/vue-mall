@@ -5,8 +5,9 @@
       <detail-swiper :topImages="topImages" />
       <detail-base-info :goodInfo="goodInfo" />
       <detail-shop-info :shopInfo="shopInfo" />
-      <detail-goods-info :detailInfo="detailInfo" @imgLoad="imgLoad"/>
-      <detail-params :paramInfo="paramInfo"/>
+      <detail-goods-info :detailInfo="detailInfo" @imgLoad="imgLoad" />
+      <detail-params :paramInfo="paramInfo" />
+      <detail-comment-info :commentInfo="commentInfo"/>
     </scroll>
   </div>
 </template>
@@ -21,6 +22,7 @@ import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParams from "./childComps/DetailParams";
+import DetailCommentInfo from "./childComps/DetailCommentInfo"
 
 export default {
   name: "Detail",
@@ -31,7 +33,8 @@ export default {
     DetailBaseInfo,
     DetailShopInfo,
     DetailGoodsInfo,
-    DetailParams
+    DetailParams,
+    DetailCommentInfo,
   },
   data() {
     return {
@@ -39,8 +42,9 @@ export default {
       topImages: [],
       goodInfo: {},
       shopInfo: {},
-      detailInfo:{},
-      paramInfo:{},
+      detailInfo: {},
+      paramInfo: {},
+      commentInfo: {},
     };
   },
   created() {
@@ -63,15 +67,22 @@ export default {
       //3.获取商家信息
       this.shopInfo = new Shop(dataObj.data.shopInfo);
       //4.获取商品详细信息
-      this.detailInfo = dataObj && dataObj.data.detailInfo
+      this.detailInfo = dataObj && dataObj.data.detailInfo;
       //5.获取参数信息
-      this.paramInfo = new GoodsParams(dataObj.data.itemParams.info, dataObj.data.itemParams.rule)
+      this.paramInfo = new GoodsParams(
+        dataObj.data.itemParams.info,
+        dataObj.data.itemParams.rule
+      );
+      // 6.获取评论信息
+      if(dataObj.data.rateInfo.cRate !== 0 ){
+        this.commentInfo = dataObj.data.rateInfo.list[0]
+      }
 
-      console.log(this.paramInfo,"dataObj")
+      console.log(this.commentInfo, "dataObj");
     },
-    imgLoad(){
-      this.$refs.scroll.refresh()
-    }
+    imgLoad() {
+      this.$refs.scroll.refresh();
+    },
   },
 };
 </script>

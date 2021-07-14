@@ -37,6 +37,6 @@ export class GoodsParams {
   constructor(info, rule) {
     this.image = info.images ? info.images[0] : ''
     this.infos = Object.entries(info.set)
-    this.sizes = rule.tables
+    this.sizes = rule ? rule.tables : []
   }
 }
