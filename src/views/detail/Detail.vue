@@ -7,13 +7,15 @@
       <detail-shop-info :shopInfo="shopInfo" />
       <detail-goods-info :detailInfo="detailInfo" @imgLoad="imgLoad" />
       <detail-params :paramInfo="paramInfo" />
-      <detail-comment-info :commentInfo="commentInfo"/>
+      <detail-comment-info :commentInfo="commentInfo" />
+      <good-list :goods="recommends" />
     </scroll>
   </div>
 </template>
 
 <script>
 import { getMockDeail } from "common/mockData/detail";
+import { getMockRecommend } from "common/mockData/recommend";
 import { Goods, Shop, GoodsParams } from "network/detail";
 import Scroll from "components/common/scroll/Scroll";
 import DetailNavBar from "./childComps/DetailNavBar";
@@ -22,7 +24,8 @@ import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParams from "./childComps/DetailParams";
-import DetailCommentInfo from "./childComps/DetailCommentInfo"
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import GoodList from "components/content/goods/GoodList";
 
 export default {
   name: "Detail",
@@ -35,6 +38,7 @@ export default {
     DetailGoodsInfo,
     DetailParams,
     DetailCommentInfo,
+    GoodList,
   },
   data() {
     return {
@@ -45,6 +49,7 @@ export default {
       detailInfo: {},
       paramInfo: {},
       commentInfo: {},
+      recommends: [],
     };
   },
   created() {
@@ -74,11 +79,12 @@ export default {
         dataObj.data.itemParams.rule
       );
       // 6.获取评论信息
-      if(dataObj.data.rateInfo.cRate !== 0 ){
-        this.commentInfo = dataObj.data.rateInfo.list[0]
+      if (dataObj.data.rateInfo.cRate !== 0) {
+        this.commentInfo = dataObj.data.rateInfo.list[0];
       }
-
-      console.log(this.commentInfo, "dataObj");
+      // 7.获取推荐信息
+      this.recommends = getMockRecommend()["data"]["list"];
+      console.log(this.recommends, "dataObj");
     },
     imgLoad() {
       this.$refs.scroll.refresh();
