@@ -48,11 +48,12 @@ export default {
     };
   },
   methods: {
+    // 监听详情图片加载完成
     imgLoad() {
       // 为了只触发一次，增肌判断逻辑
-      if (++this.counter === this.imageListLength) {
+      // if (++this.counter === this.imageListLength) {
         this.$emit("imgLoad");
-      }
+      // }
     },
   },
 };

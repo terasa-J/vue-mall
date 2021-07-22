@@ -5,12 +5,12 @@
     </nav-bar>
     <!-- 吸顶效果 -->
     <tab-control
-        class="tab-control-top"
-        :titles="['流行', '新款', '精选']"
-        @tabClick="tabClick"
-        ref="tabControlTop"
-        v-show="isOffsetTop"
-      />
+      class="tab-control-top"
+      :titles="['流行', '新款', '精选']"
+      @tabClick="tabClick"
+      ref="tabControlTop"
+      v-show="isOffsetTop"
+    />
 
     <my-scroll
       class="content"
@@ -20,7 +20,7 @@
       :pull-up-load="true"
       @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" @swiperImgLoad="swiperImgLoad"/>
+      <home-swiper :banners="banners" @swiperImgLoad="swiperImgLoad" />
       <recommond-view :recommends="recommends" />
       <feature-view />
       <tab-control
@@ -54,7 +54,7 @@ import {
   mockSellGoods,
 } from "common/mockData/goods";
 
-import { debounce } from 'common/utils'
+import itemLoadMixins from "common/mixins.js"
 
 export default {
   name: "Home",
@@ -69,6 +69,7 @@ export default {
     MyScroll,
     BackTop,
   },
+  mixins:[itemLoadMixins],
   data() {
     return {
       banners: [
@@ -119,11 +120,11 @@ export default {
       currentType: "pop",
       isShowBackTop: false,
       //获取吸顶距离
-      tabControlOffSet: 0 ,
+      tabControlOffSet: 0,
       //判断是否需要吸顶
-      isOffsetTop:false,
+      isOffsetTop: false,
       //记录滚动Y轴的位置
-      scrollY:0,
+      scrollY: 0,
     };
   },
   computed: {
@@ -131,17 +132,20 @@ export default {
       return this.goods[this.currentType].list;
     },
   },
-  destroyed(){
+  destroyed() {
     // console.log("hoem destroyed")
   },
-  activated(){
+  activated() {
     // console.log("hoem activated")
-    this.$refs.scroll.scrollTo(0, this.scrollY, 0)
-    this.$refs.scroll.refresh()
+    this.$refs.scroll.scrollTo(0, this.scrollY, 0);
+    this.$refs.scroll.refresh();
   },
-  deactivated(){
-    this.scrollY = this.$refs.scroll.getScrollY()
+  deactivated() {
+    //1.记录y轴的位置
+    this.scrollY = this.$refs.scroll.getScrollY();
     // console.log("hoem deactivated",this.scrollY)
+    //2.撤销监听图片加载
+    this.$bus.$off("itemImgLoad", this.itemImgLoadListener);
   },
   created() {
     //网络不通，写mock数据
@@ -149,18 +153,6 @@ export default {
     this.getHomeMockGoods("pop");
     this.getHomeMockGoods("new");
     this.getHomeMockGoods("sell");
-  },
-  mounted() {
-    //监听图片加载事件
-    //由于放在create可能会存在拿不到dom元素，因此放在mounted中
-
-    //为了减少函数的调用次数，这里使用防抖函数
-    const refrsh = debounce(this.$refs.scroll.refresh, 100)
-    this.$bus.$on("goodImgLoad", () => {
-      // this.$refs.scroll.refresh();
-      // ...args的作用  refrsh("111","2222")
-      refrsh()
-    });
   },
   methods: {
     /**
@@ -222,8 +214,8 @@ export default {
           break;
       }
       // 由于吸顶有多个组件，这这里需要设置点击那个
-      this.$refs.tabControl.currentIndex = index
-      this.$refs.tabControlTop.currentIndex = index
+      this.$refs.tabControl.currentIndex = index;
+      this.$refs.tabControlTop.currentIndex = index;
     },
     //返回顶部
     backClick() {
@@ -235,7 +227,7 @@ export default {
       this.isShowBackTop = -position.y > 500;
 
       //2.获取tabControl吸顶位置
-      this.isOffsetTop = -position.y > this.tabControlOffSet
+      this.isOffsetTop = -position.y > this.tabControlOffSet;
     },
     //加载到底部，刷新更多
     async loadMore() {
@@ -244,13 +236,13 @@ export default {
       });
     },
     //吸顶距离判断
-    swiperImgLoad(){
+    swiperImgLoad() {
       //this.$refs.tabControl:获取到的是一个组件
       //this.$refs.tabControl.$el:获取到的是一个元素，可以获取相关的属性
       //offsetTop 指 obj 距离上方或上层控件的位置，整型，单位像素。
-      this.tabControlOffSet = this.$refs.tabControl.$el.offsetTop
+      this.tabControlOffSet = this.$refs.tabControl.$el.offsetTop;
       // console.log(this.tabControlOffSet)
-    }
+    },
   },
 };
 </script>
@@ -263,7 +255,7 @@ export default {
 .home-nav {
   background-color: var(--color-tint);
   color: #fff;
-/* 在better-scroll中无效，如果使用原生滚动，则有效 */
+  /* 在better-scroll中无效，如果使用原生滚动，则有效 */
   /* position: fixed;
   left: 0;
   right: 0;
@@ -278,7 +270,7 @@ export default {
   z-index: 9;
 } */
 
-.tab-control-top{
+.tab-control-top {
   position: relative;
   z-index: 9;
 }

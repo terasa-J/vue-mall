@@ -26,6 +26,7 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParams from "./childComps/DetailParams";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import GoodList from "components/content/goods/GoodList";
+import itemLoadMixins from "common/mixins.js";
 
 export default {
   name: "Detail",
@@ -40,6 +41,7 @@ export default {
     DetailCommentInfo,
     GoodList,
   },
+  mixins: [itemLoadMixins],
   data() {
     return {
       iid: null,
@@ -56,6 +58,10 @@ export default {
     this.iid = this.$route.query.iid;
     //获取详情数据
     this.getDetailData();
+  },
+  destroyed() {
+    //1.撤销监听图片加载
+    this.$bus.$off("itemImgLoad", this.itemImgLoadListener);
   },
   methods: {
     //获取详情数据(mock)
@@ -84,10 +90,11 @@ export default {
       }
       // 7.获取推荐信息
       this.recommends = getMockRecommend()["data"]["list"];
-      console.log(this.recommends, "dataObj");
+      // console.log(this.recommends, "dataObj");
     },
     imgLoad() {
-      this.$refs.scroll.refresh();
+      // this.$refs.scroll.refresh();
+      this.newRefresh();
     },
   },
 };

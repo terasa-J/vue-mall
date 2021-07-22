@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     goodImgLoad() {
-      this.$bus.$emit("goodImgLoad");
+      this.$bus.$emit("itemImgLoad");
     },
     itemClick() {
       this.$router.push({
