@@ -1,14 +1,14 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-navbar" />
-    <scroll class="content" ref="scroll">
+    <detail-nav-bar class="detail-navbar" @titleClick="titleClick" ref="nav" />
+    <scroll class="content" ref="scroll" @scroll="contentScroll" :probeType="3">
       <detail-swiper :topImages="topImages" />
       <detail-base-info :goodInfo="goodInfo" />
       <detail-shop-info :shopInfo="shopInfo" />
       <detail-goods-info :detailInfo="detailInfo" @imgLoad="imgLoad" />
-      <detail-params :paramInfo="paramInfo" />
-      <detail-comment-info :commentInfo="commentInfo" />
-      <good-list :goods="recommends" />
+      <detail-params ref="params" :paramInfo="paramInfo" />
+      <detail-comment-info ref="comments" :commentInfo="commentInfo" />
+      <good-list ref="recommends" :goods="recommends" />
     </scroll>
   </div>
 </template>
@@ -26,10 +26,13 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParams from "./childComps/DetailParams";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import GoodList from "components/content/goods/GoodList";
-import itemLoadMixins from "common/mixins.js";
+import itemLoadMixins from "common/mixins";
+// 不知道为啥，需要单独引入。mixins也有
+import { debounce } from "common/utils";
 
 export default {
   name: "Detail",
+  mixins: [itemLoadMixins],
   components: {
     Scroll,
     DetailNavBar,
@@ -41,7 +44,6 @@ export default {
     DetailCommentInfo,
     GoodList,
   },
-  mixins: [itemLoadMixins],
   data() {
     return {
       iid: null,
@@ -52,12 +54,27 @@ export default {
       paramInfo: {},
       commentInfo: {},
       recommends: [],
+      themeTopYs: [],
+      getThemeTopYs: null,
+      currentIndex: 0,
     };
   },
   created() {
     this.iid = this.$route.query.iid;
     //获取详情数据
     this.getDetailData();
+  },
+  mounted() {
+    //初始化每个组件的offSetTop
+    this.getThemeTopYs = debounce(() => {
+      this.themeTopYs = [];
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.comments.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.recommends.$el.offsetTop);
+      // 添加一个最大值，为了优化【内容滚动时候，对应主题标红】功能的判断条件
+      this.themeTopYs.push(Number.MAX_VALUE);
+    });
   },
   destroyed() {
     //1.撤销监听图片加载
@@ -95,6 +112,50 @@ export default {
     imgLoad() {
       // this.$refs.scroll.refresh();
       this.newRefresh();
+      this.getThemeTopYs();
+    },
+    // 点击标题，滚动到对应主题
+    titleClick(index) {
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index]);
+    },
+    // 内容滚动时候，对应主题标红
+    contentScroll(position) {
+      const positionY = -position.y;
+      // console.log(positionY);
+      //根据当前Y值比较
+      const length = this.themeTopYs.length;
+      //优化前：
+      // for (let i = 0; i < length; i++) {
+      //   if (
+      //     // this.currentIndex !== i 这个条件为了，防止频繁判断
+      //分开判断，防止数组越界
+      //     this.currentIndex !== i &&
+      //     (
+      //       (i < length - 1 &&
+      //       positionY >= this.themeTopYs[i] &&
+      //       positionY < this.themeTopYs[i + 1])
+      //        ||
+      //       (i === length - 1 && positionY >= this.themeTopYs[i])
+      //     )
+      //   ) {
+      //     this.currentIndex = i;
+      //     this.$refs.nav.currentIndex = this.currentIndex;
+      //   }
+      // }
+
+      //优化后：hack做法
+      //length-1：this.themeTopYs增加了最大值属性，所以最后一个不需要循环
+       for (let i = 0; i < length-1; i++) {
+        if (
+          // this.currentIndex !== i 这个条件为了，防止频繁判断
+          this.currentIndex !== i &&
+            positionY >= this.themeTopYs[i] &&
+            positionY < this.themeTopYs[i + 1]
+        ) {
+          this.currentIndex = i;
+          this.$refs.nav.currentIndex = this.currentIndex;
+        }
+      }
     },
   },
 };

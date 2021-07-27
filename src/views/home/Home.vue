@@ -54,7 +54,7 @@ import {
   mockSellGoods,
 } from "common/mockData/goods";
 
-import itemLoadMixins from "common/mixins.js"
+import itemLoadMixins from "common/mixins";
 
 export default {
   name: "Home",

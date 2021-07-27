@@ -1,3 +1,4 @@
+<script>
 import { debounce } from "common/utils";
 
 export default {
@@ -5,7 +6,7 @@ export default {
     return {
       itemImgLoadListener: null,
       newRefresh: null,
-    }
+    };
   },
   mounted() {
     //监听图片加载事件
@@ -19,4 +20,5 @@ export default {
       this.newRefresh();
     });
   },
-}
+};
+</script>
