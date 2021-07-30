@@ -54,7 +54,7 @@ import {
   mockSellGoods,
 } from "common/mockData/goods";
 
-import itemLoadMixins from "common/mixins";
+import { itemLoadMixins,backTopMixins } from "common/mixins.js";
 
 export default {
   name: "Home",
@@ -69,7 +69,7 @@ export default {
     MyScroll,
     BackTop,
   },
-  mixins:[itemLoadMixins],
+  mixins: [itemLoadMixins,backTopMixins],
   data() {
     return {
       banners: [
@@ -118,7 +118,6 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
-      isShowBackTop: false,
       //获取吸顶距离
       tabControlOffSet: 0,
       //判断是否需要吸顶
@@ -217,14 +216,10 @@ export default {
       this.$refs.tabControl.currentIndex = index;
       this.$refs.tabControlTop.currentIndex = index;
     },
-    //返回顶部
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0);
-    },
     //获取实时位置监听
     contentScroll(position) {
       //1.设置当前位置>500,显示backTop按钮
-      this.isShowBackTop = -position.y > 500;
+      this.listenBackTop(position)
 
       //2.获取tabControl吸顶位置
       this.isOffsetTop = -position.y > this.tabControlOffSet;

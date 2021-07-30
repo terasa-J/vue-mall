@@ -1,7 +1,7 @@
-<script>
+
 import { debounce } from "common/utils";
 
-export default {
+export const itemLoadMixins = {
   data() {
     return {
       itemImgLoadListener: null,
@@ -21,4 +21,21 @@ export default {
     });
   },
 };
-</script>
+
+export const backTopMixins = {
+  data() {
+    return {
+      isShowBackTop: false,
+    }
+  },
+  methods: {
+    //返回顶部
+    backClick() {
+      this.$refs.scroll.scrollTo(0, 0);
+    },
+    //是否显示返回按钮
+    listenBackTop(position) {
+      this.isShowBackTop = -position.y > 500;
+    }
+  }
+}

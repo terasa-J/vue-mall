@@ -10,6 +10,8 @@
       <detail-comment-info ref="comments" :commentInfo="commentInfo" />
       <good-list ref="recommends" :goods="recommends" />
     </scroll>
+    <detail-bottom-bar @addCart="addCart" />
+    <back-top @click.native="backClick" v-show="isShowBackTop" />
   </div>
 </template>
 
@@ -25,14 +27,16 @@ import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParams from "./childComps/DetailParams";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
+import BackTop from "components/content/backTop/BackTop";
 import GoodList from "components/content/goods/GoodList";
-import itemLoadMixins from "common/mixins";
+import { itemLoadMixins, backTopMixins } from "common/mixins.js";
 // 不知道为啥，需要单独引入。mixins也有
 import { debounce } from "common/utils";
 
 export default {
   name: "Detail",
-  mixins: [itemLoadMixins],
+  mixins: [itemLoadMixins, backTopMixins],
   components: {
     Scroll,
     DetailNavBar,
@@ -42,6 +46,8 @@ export default {
     DetailGoodsInfo,
     DetailParams,
     DetailCommentInfo,
+    DetailBottomBar,
+    BackTop,
     GoodList,
   },
   data() {
@@ -118,10 +124,10 @@ export default {
     titleClick(index) {
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index]);
     },
-    // 内容滚动时候，对应主题标红
+    // 内容滚动时候，
     contentScroll(position) {
-      const positionY = -position.y;
-      // console.log(positionY);
+      //1.对应主题标红
+
       //根据当前Y值比较
       const length = this.themeTopYs.length;
       //优化前：
@@ -145,17 +151,34 @@ export default {
 
       //优化后：hack做法
       //length-1：this.themeTopYs增加了最大值属性，所以最后一个不需要循环
-       for (let i = 0; i < length-1; i++) {
+      const positionY = -position.y;
+      for (let i = 0; i < length - 1; i++) {
         if (
           // this.currentIndex !== i 这个条件为了，防止频繁判断
           this.currentIndex !== i &&
-            positionY >= this.themeTopYs[i] &&
-            positionY < this.themeTopYs[i + 1]
+          positionY >= this.themeTopYs[i] &&
+          positionY < this.themeTopYs[i + 1]
         ) {
           this.currentIndex = i;
           this.$refs.nav.currentIndex = this.currentIndex;
         }
       }
+      //2.是否显示返回按钮
+      this.listenBackTop(position);
+    },
+    //添加购物车
+    addCart() {
+      //1.获取购物车需要显示的信息
+      const product = {};
+      product.imge = this.topImages[0];
+      product.title = this.goodInfo.title;
+      product.desc = this.goodInfo.desc;
+      product.price = this.goodInfo.lowPrice;
+      product.iid = this.iid;
+      //2.将商品放到购物车中 vueX
+      this.$store.dispatch("addCartList", product);
+
+      console.log(this.$store.state.cartList)
     },
   },
 };
@@ -177,6 +200,7 @@ export default {
 }
 
 .content {
-  height: calc(100% - 44px);
+  /* 44px:头部顶烂   49px:底部购物车 */
+  height: calc(100% - 44px - 49px);
 }
 </style>
