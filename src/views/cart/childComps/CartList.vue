@@ -1,10 +1,12 @@
 <template>
-  <div id="catrgory">
-    <h2>学习better-scroll插件</h2>
-    <div class="wrapper">
-      <div class="content">
-      <feature-view />
-      <ul >
+  <div class="cart-list">
+    <scroll class="content">
+      <cart-list-item
+        v-for="(item, index) in cartList"
+        :key="index"
+        :item-info="item"
+      />
+       <ul >
         <li>分类列表1</li>
         <li>分类列表2</li>
         <li>分类列表3</li>
@@ -106,72 +108,33 @@
         <li>分类列表99</li>
         <li>分类列表100</li>
       </ul>
-      </div>
-    </div>
+    </scroll>
   </div>
 </template>
 
 <script>
-import BetterScroll from "better-scroll";
-import FeatureView from "../home/childComps/FeatureView";
+import { mapGetters } from "vuex";
+import Scroll from "components/common/scroll/Scroll";
+import CartListItem from "./CartListItem";
 
 export default {
-  name: "Category",
-  data() {
-    return {
-      bscrool: null,
-    };
+  name: "CartList",
+  components: {
+    Scroll,
+    CartListItem,
   },
-  components:{
-    FeatureView,
-  },
-  mounted() {
-    this.bscrool = new BetterScroll(".wrapper", {
-      // 获取滚动的位置
-      probeType: 3,
-      // 当底部下拉距离超过阈值
-      pullUpLoad: true,
-    });
-
-    // 获取滚动的位置
-    this.bscrool.on("scroll", (position) => {
-      // console.log(position);
-    });
-
-    // 当底部下拉距离超过阈值
-    this.bscrool.on("pullingUp", () => {
-      //调取接口，获取新数据
-      //数据重新赋值，显示
-      console.log("下拉加载更多！");
-
-      setTimeout(() => {
-      // 必须加上这个方法，否则只会加载一次
-        this.bscrool.finishPullUp();
-      }, 2000);
-    });
+  computed: {
+    ...mapGetters(["cartList"]),
   },
 };
 </script>
-
 <style scoped>
-#catrgory {
-  height: 100vh;
-  position: relative;
+.cart-list {
+  /* 44px:顶部  49px:底部  40px:底部汇总数据 */
+  height: calc(100% - 44px - 49px - 40px);
 }
-
-.wrapper {
-  /* height: 150px; */
-  background-color: red;
-
-  /* y轴滚动样式 */
-  /* overflow: hidden; */
-  /* overflow-y: scroll; */
-
+.content {
+  height: 100%;
   overflow: hidden;
-  position: absolute;
-  top: 44px;
-  bottom: 49px;
-  left: 0;
-  right: 0;
 }
 </style>
