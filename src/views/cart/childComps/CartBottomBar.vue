@@ -1,13 +1,17 @@
 <template>
   <div class="bottom-bar">
     <div class="check-content">
-      <check-button class="check-button" :isChecked="isSelectAll" />
+      <check-button
+        class="check-button"
+        :isChecked="isSelectAll"
+        @click.native="checkClick"
+      />
       <span>全选</span>
     </div>
 
     <div class="total-price">合计￥{{ totalPrice }}</div>
 
-    <div class="calculate">去计算({{ checkedLength }})</div>
+    <div class="calculate" @click="calculate">去计算({{ checkedLength }})</div>
   </div>
 </template>
 
@@ -42,6 +46,7 @@ export default {
         return item.checked;
       }).length;
     },
+    // 全选按钮显示状态
     isSelectAll() {
       //逻辑： 如果有一个不选中，则返回false。反之为true
       // 1.先判空
@@ -56,6 +61,23 @@ export default {
 
       // 使用filter函数
       // return !this.cartList.filter((item) => !item.checked).length;
+    },
+  },
+  methods: {
+    // 点击全选按钮
+    checkClick() {
+      if (this.isSelectAll) {
+        //购物车商品--全部选中
+        this.cartList.forEach((item) => (item.checked = false));
+      } else {
+        // 购物车商品--部分或全部 不选中
+        this.cartList.forEach((item) => (item.checked = true));
+      }
+    },
+    calculate() {
+      if (!this.isSelectAll) {
+        this.$toast.show("请选中商品");
+      }
     },
   },
 };

@@ -33,7 +33,7 @@ import GoodList from "components/content/goods/GoodList";
 import { itemLoadMixins, backTopMixins } from "common/mixins.js";
 // 不知道为啥，需要单独引入。mixins也有
 import { debounce } from "common/utils";
-
+import { mapActions } from "vuex";
 export default {
   name: "Detail",
   mixins: [itemLoadMixins, backTopMixins],
@@ -87,6 +87,7 @@ export default {
     this.$bus.$off("itemImgLoad", this.itemImgLoadListener);
   },
   methods: {
+    ...mapActions(["addCartList"]),
     //获取详情数据(mock)
     getDetailData() {
       let dataObj = getMockDeail()[this.iid];
@@ -176,9 +177,17 @@ export default {
       product.price = this.goodInfo.lowPrice;
       product.iid = this.iid;
       //2.将商品放到购物车中 vueX
-      this.$store.dispatch("addCartList", product);
+      // this.$store.dispatch("addCartList", product).then((res) => {
+      //   // 3.加入购物车成功后，在页面显示toast弹窗
+      //   console.log(res);
+      // });
 
-      console.log(this.$store.state.cartList)
+      // 使用 mapActions
+      // this.addCartList() ==== this.$store.dispatch("addCartList", product)
+      this.addCartList(product).then((res) => {
+        // 使用自定义插件
+        this.$toast.show(res);
+      });
     },
   },
 };
