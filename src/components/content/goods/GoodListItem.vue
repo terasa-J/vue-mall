@@ -1,6 +1,8 @@
 <template>
   <div class="goods-item" @click="itemClick">
-    <img :src="showImg" alt="" @load="goodImgLoad" />
+    <!-- <img :src="showImg" alt="" @load="goodImgLoad" /> -->
+    <!-- 使用懒加载vue-lazyload -->
+    <img v-lazy="showImg" alt="" @load="goodImgLoad" />
     <div class="goods-info">
       <p>{{ goodItem.title }}</p>
       <span class="price">{{ goodItem.price }}</span>
@@ -20,10 +22,10 @@ export default {
       },
     },
   },
-  computed:{
-    showImg(){
-      return this.goodItem.img || this.goodItem.image 
-    }
+  computed: {
+    showImg() {
+      return this.goodItem.img || this.goodItem.image;
+    },
   },
   methods: {
     goodImgLoad() {

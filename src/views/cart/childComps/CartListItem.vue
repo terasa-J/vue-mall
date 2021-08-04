@@ -5,7 +5,9 @@
       <check-button :is-checked="itemInfo.checked" @click.native="checkClick" />
     </div>
     <div class="item-img">
-      <img :src="itemInfo.imge" alt="商品图片" />
+      <!-- <img :src="itemInfo.imge" alt="商品图片" /> -->
+      <!-- 使用懒加载vue-lazyload -->
+      <img v-lazy="itemInfo.imge" alt="商品图片" />
     </div>
     <div class="item-info">
       <div class="item-title">
