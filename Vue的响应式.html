@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- 
+    1.app.message修改数据，Vue内部是如何监听message的数据改变。
+      Object.defineProperty -> 监听对象属性的变化
+    
+    2.当数据发送改变，Vue是如何知道要通知那些人，吧界面进行刷新。
+      发布订阅者模式
+   -->
+  <div id="app">
+    {{message}}
+    {{message}}
+    {{message}}
+
+    {{name}}
+  </div>
+
+
+  <script>
+    const obj = {
+      message: "哈哈哈",
+      name: "why"
+    };
+
+    // 一、Object.defineProperty
+    Object.keys(obj).forEach(key => {
+      let value = obj[key]
+      Object.defineProperty(obj, key, {
+        set(newVal) {
+          console.log("Set:监听" + key + "发送改变")
+          value = newVal
+        },
+        get() {
+          console.log("Get：获取" + key + "对应的数值")
+          return value
+        }
+      })
+    })
+
+    // 二、发布订阅者模式
+    // Dep = dependency 依赖
+    // 发布者
+    class Dep {
+      constructor() {
+        // subs = subscribe:订阅
+        this.subs = []
+      }
+      addSubs(watcher) {
+        this.subs.push(watcher)
+      }
+      notify() {
+        this.subs.forEach(item => item.update())
+      }
+    }
+
+    // 订阅者
+    class Watcher {
+      constructor(name) {
+        this.name = name
+      }
+      update() {
+        console.log(this.name + '发生变化')
+      }
+    }
+
+    // 例子
+    const dep = new Dep()
+    const w1 = new Watcher('张三')
+    dep.addSubs(w1)
+    const w2 = new Watcher('李四')
+    dep.addSubs(w2)
+    const w3 = new Watcher('王五')
+    dep.addSubs(w3)
+
+    dep.notify()
+  </script>
+
+  <script src="./node_modules/vue/dist/vue.js"></script>
+  <script>
+    const app = new Vue({
+      el: "#app",
+      data: {
+        message: "哈哈哈",
+        name: "why"
+      }
+    })
+  </script>
+</body>
+
+</html>
